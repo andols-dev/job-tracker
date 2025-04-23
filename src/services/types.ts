@@ -9,7 +9,7 @@ export interface Job {
 
 export enum Status {
     'Applied',
-    'InterViewing',
+    'Interviewing',
     'Offered',
     'Rejected',
 }
