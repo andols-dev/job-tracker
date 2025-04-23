@@ -1,5 +1,7 @@
 import { useState } from "react";
-import "./App.css";
+// import app.css
+import "./app.css";
+
 import { Job, Status } from "./services/types";
 import DashBoard from "./pages/DashBoard";
 function App() {
@@ -13,10 +15,24 @@ function App() {
     },
     {
       id: "2",
-      title: "Front-end developer",
+      title: "Back-end developer",
       companyName: "Manpower",
       dateApplied: "2025-09-17",
       status: Status.Applied,
+    },
+    {
+      id: "3",
+      title: "Full-stack developer",
+      companyName: "TechCorp",
+      dateApplied: "2025-09-20",
+      status: Status.Interviewing,
+    },
+    {
+      id: "4",
+      title: "UI/UX Designer",
+      companyName: "Designify",
+      dateApplied: "2025-09-22",
+      status: Status.Offered,
     },
   ]);
 
