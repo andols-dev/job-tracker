@@ -38,7 +38,7 @@ function App() {
 
   return (
     <>
-      <DashBoard jobList={jobList}/>
+      <DashBoard jobList={jobList} />
     </>
   );
 }

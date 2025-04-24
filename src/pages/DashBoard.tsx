@@ -4,11 +4,12 @@ import JobListTable from '../components/JobListTable';
 
 interface DashBoardProps {
     jobList: Job[],
+    
 }
 const DashBoard: React.FC<DashBoardProps> = ({jobList}) => {
 
   return (
-    <JobListTable jobList={jobList}/>
+    <JobListTable jobList={jobList} />
   )
 }
 
