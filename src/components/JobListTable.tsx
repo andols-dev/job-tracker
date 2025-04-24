@@ -16,7 +16,9 @@ const JobListTable: React.FC<JobListProps> = ({ jobList }) => {
   return (
     <>
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-end mb-4">
+        
+        <div className="flex justify-between items-center mb-4">
+        <div className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"><button>Add job</button></div>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
