@@ -36,10 +36,11 @@ function App() {
     },
   ]);
 
+  // Updated styles for a professional look
   return (
-    <>
+    <div className="bg-gradient-to-r from-gray-100 to-gray-200 min-h-screen py-10">
       <DashBoard jobList={jobList} />
-    </>
+    </div>
   );
 }
 

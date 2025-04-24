@@ -9,7 +9,9 @@ interface DashBoardProps {
 const DashBoard: React.FC<DashBoardProps> = ({jobList}) => {
 
   return (
+    <div className="p-6 bg-white shadow-md rounded-lg">
     <JobListTable jobList={jobList} />
+    </div>
   )
 }
 
