@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from 'react'
+import React, {  useState, useMemo } from 'react'
 import { Job, Status } from '../services/types'
 
 interface JobListProps {
@@ -7,8 +7,11 @@ interface JobListProps {
 }
 
 const JobListTable: React.FC<JobListProps> = ({ jobList }) => {
-  const [filter, setfilter] = useState<string>('');
+  const [filter, setFilter] = useState<string>('');
 
+  const filteredJobs = useMemo(() => {
+    return jobList.filter(job => (filter ? Status[job.status] === filter : true));
+  }, [jobList, filter]);
 
   return (
     <>
@@ -16,7 +19,7 @@ const JobListTable: React.FC<JobListProps> = ({ jobList }) => {
         <div className="flex justify-end mb-4">
           <select
             value={filter}
-            onChange={(e) => setfilter(e.target.value)}
+            onChange={(e) => setFilter(e.target.value)}
             className="p-2 border border-gray-300 rounded bg-gray-200 text-gray-700"
           >
             <option value="">All jobs</option>
@@ -39,7 +42,7 @@ const JobListTable: React.FC<JobListProps> = ({ jobList }) => {
             </tr>
           </thead>
           <tbody>
-            {jobList.filter(job => (filter ? Status[job.status] == filter : true)).map((job) => (
+            {filteredJobs.map((job) => (
               <tr key={job.id} className="hover:bg-gray-100 text-gray-600 text-sm">
                 <td className="border border-gray-300 px-6 py-4">{job.companyName}</td>
                 <td className="border border-gray-300 px-6 py-4">{job.title}</td>
