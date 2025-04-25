@@ -2,57 +2,64 @@ import React, { useState, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Job, Status } from "../services/types";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+
 interface JobListProps {
-  jobList: Job[];
-  addJob: (job: Job) => void,
+  jobList: Job[]; // List of jobs to display
+  addJob: (job: Job) => void; // Function to add a new job
 }
 
 const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
-  const [filter, setFilter] = useState<string>("");
-  const [isModalShowing, setIsModalShowing] = useState(false);
+  const [filter, setFilter] = useState<string>(""); // State for filtering jobs by status
+  const [isModalShowing, setIsModalShowing] = useState(false); // State for showing/hiding the modal
+
+  // React Hook Form setup
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm();
-  const onSubmit:SubmitHandler<FieldValues> = (data) => {
-    const newJob:Job = {
-      id: uuidv4(),
+
+  // Function to handle form submission
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    const newJob: Job = {
+      id: uuidv4(), // Generate a unique ID for the new job
       companyName: data.companyName,
       title: data.jobTitle,
       dateApplied: data.dateApplied,
-      status: Status[data.status as keyof typeof Status],
+      status: Status[data.status as keyof typeof Status], // Map string to Status enum
       notes: data.notes,
-    }
-    addJob(newJob);
-    setIsModalShowing(false);
-    reset();
+    };
+    addJob(newJob); // Add the new job to the list
+    setIsModalShowing(false); // Close the modal
+    reset(); // Reset the form
+  };
 
+  console.log(errors); // Log form errors for debugging
 
-  }
-    
-  console.log(errors);
-
+  // Memoized function to filter jobs based on the selected status
   const filteredJobs = useMemo(() => {
     return jobList.filter((job) =>
       filter ? Status[job.status] === filter : true
     );
   }, [jobList, filter]);
 
+  // Function to close the modal and reset the form
   const closingModal = () => {
     setIsModalShowing(false);
     reset();
-  }
-
+  };
 
   return (
     <>
+      {/* Container for the job list table and controls */}
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-4">
+          {/* Button to open the modal */}
           <div className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             <button onClick={() => setIsModalShowing(true)}>Add job</button>
           </div>
+          {/* Dropdown to filter jobs by status */}
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -60,7 +67,7 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
           >
             <option value="">All jobs</option>
             {Object.keys(Status)
-              .filter((key) => isNaN(Number(key))) // Filter out numeric keys
+              .filter((key) => isNaN(Number(key))) // Exclude numeric keys from the enum
               .map((status) => (
                 <option key={status} value={status} className="text-gray-700">
                   {status}
@@ -68,6 +75,7 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
               ))}
           </select>
         </div>
+        {/* Table displaying the list of jobs */}
         <table className="min-w-full border-collapse border border-gray-300 shadow-lg rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-gradient-to-r from-blue-500 to-purple-500 text-white uppercase text-sm leading-normal">
@@ -109,9 +117,9 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
         </table>
       </div>
 
+      {/* Modal for adding a new job */}
       {isModalShowing && (
         <>
-          
           <div
             className="modal modal-open fixed inset-0 flex items-center justify-center bg-gray-800"
             style={{ backgroundColor: "rgba(31, 41, 55, 0.85)" }} // Custom background opacity
@@ -119,6 +127,7 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
             <div className="modal-box w-96 bg-white p-6">
               <h3 className="font-bold text-lg">Add a new job</h3>
               <form className="py-4 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+                {/* Input for company name */}
                 <div>
                   <label
                     htmlFor="companyName"
@@ -130,11 +139,17 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
                     type="text"
                     className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Enter company name"
-                    {...register("companyName", {required: "Company name is required"})}
+                    {...register("companyName", {
+                      required: "Company name is required",
+                    })}
                   />
                   {errors.companyName?.message && (
-                  <span className="text-red-500 text-sm">{String(errors.companyName.message)}</span>)}
+                    <span className="text-red-500 text-sm">
+                      {String(errors.companyName.message)}
+                    </span>
+                  )}
                 </div>
+                {/* Input for job title */}
                 <div>
                   <label
                     htmlFor="jobTitle"
@@ -146,11 +161,15 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
                     type="text"
                     className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     placeholder="Enter job title"
-                    {...register("jobTitle", {required: "Title is required"})}
+                    {...register("jobTitle", { required: "Title is required" })}
                   />
                   {errors.jobTitle?.message && (
-                  <span className="text-red-500 text-sm">{String(errors.jobTitle.message)}</span>)}
+                    <span className="text-red-500 text-sm">
+                      {String(errors.jobTitle.message)}
+                    </span>
+                  )}
                 </div>
+                {/* Input for date applied */}
                 <div>
                   <label
                     htmlFor="dateApplied"
@@ -161,11 +180,17 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
                   <input
                     type="date"
                     className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    {...register("dateApplied", {required: "Date is required"})}
+                    {...register("dateApplied", {
+                      required: "Date is required",
+                    })}
                   />
                   {errors.dateApplied?.message && (
-                  <span className="text-red-500 text-sm">{String(errors.dateApplied.message)}</span>)}
+                    <span className="text-red-500 text-sm">
+                      {String(errors.dateApplied.message)}
+                    </span>
+                  )}
                 </div>
+                {/* Dropdown for job status */}
                 <div>
                   <label
                     htmlFor="status"
@@ -179,7 +204,7 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
                   >
                     <option value="">Select status</option>
                     {Object.keys(Status)
-                      .filter((key) => isNaN(Number(key)))
+                      .filter((key) => isNaN(Number(key))) // Exclude numeric keys
                       .map((status) => (
                         <option key={status} value={status}>
                           {status}
@@ -187,9 +212,12 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
                       ))}
                   </select>
                   {errors.status?.message && (
-                    <span className="text-red-500 text-sm">{String(errors.status.message)}</span>
+                    <span className="text-red-500 text-sm">
+                      {String(errors.status.message)}
+                    </span>
                   )}
                 </div>
+                {/* Input for notes */}
                 <div>
                   <label
                     htmlFor="notes"
@@ -204,6 +232,7 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
                     placeholder="Add any notes here..."
                   ></textarea>
                 </div>
+                {/* Modal action buttons */}
                 <div className="modal-action flex justify-end space-x-4">
                   <button
                     type="submit"
