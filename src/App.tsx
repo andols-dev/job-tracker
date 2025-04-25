@@ -36,10 +36,14 @@ function App() {
     },
   ]);
 
+  const addJob = (job: Job) => {
+    setJobList(prevJobs => [...prevJobs,job]);
+  }
+
   // Updated styles for a professional look
   return (
     <div className="bg-gradient-to-r from-gray-100 to-gray-200 min-h-screen py-10">
-      <DashBoard jobList={jobList} />
+      <DashBoard jobList={jobList} addJob={addJob}/>
     </div>
   );
 }
