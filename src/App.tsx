@@ -1,49 +1,35 @@
-import { useState } from "react";
-// import app.css
+import { useEffect, useState } from "react";
+// Importing the CSS file for styling
 import "./app.css";
 
-import { Job, Status } from "./services/types";
+import { Job } from "./services/types";
 import DashBoard from "./pages/DashBoard";
+
 function App() {
-  const [jobList, setJobList] = useState<Job[]>([
-    {
-      id: "1",
-      title: "Front-end developer",
-      companyName: "Saab",
-      dateApplied: "2025-09-15",
-      status: Status.Applied,
-    },
-    {
-      id: "2",
-      title: "Back-end developer",
-      companyName: "Manpower",
-      dateApplied: "2025-09-17",
-      status: Status.Applied,
-    },
-    {
-      id: "3",
-      title: "Full-stack developer",
-      companyName: "TechCorp",
-      dateApplied: "2025-09-20",
-      status: Status.Interviewing,
-    },
-    {
-      id: "4",
-      title: "UI/UX Designer",
-      companyName: "Designify",
-      dateApplied: "2025-09-22",
-      status: Status.Offered,
-    },
-  ]);
+  // State to manage the list of jobs, initialized from localStorage
+  const [jobList, setJobList] = useState<Job[]>(() => {
+    try {
+      // Retrieve job list from localStorage or initialize as an empty array
+      return JSON.parse(localStorage.getItem("jobList") || "[]") as Job[];
+    } catch {
+      return [];
+    }
+  });
 
+  // Effect to update localStorage whenever the job list changes
+  useEffect(() => {
+    localStorage.setItem("jobList", JSON.stringify(jobList));
+  }, [jobList]);
+
+  // Function to add a new job to the job list
   const addJob = (job: Job) => {
-    setJobList(prevJobs => [...prevJobs,job]);
-  }
+    setJobList((prevJobs) => [...prevJobs, job]);
+  };
 
-  // Updated styles for a professional look
+  // Render the application with a gradient background and pass props to DashBoard
   return (
     <div className="bg-gradient-to-r from-gray-100 to-gray-200 min-h-screen py-10">
-      <DashBoard jobList={jobList} addJob={addJob}/>
+      <DashBoard jobList={jobList} addJob={addJob} />
     </div>
   );
 }
