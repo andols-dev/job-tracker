@@ -1,22 +1,25 @@
 # Job Tracker
 
-I am creating a **Job Tracker** application using **React**, **TypeScript**, and **Vite**. It helps users manage and track their job applications efficiently.
+A finished **Job Tracker** application built with **React**, **TypeScript**, and **Vite**. It helps users manage and track their job applications efficiently.
 
-## Upcoming Features
+## Live Demo
 
-- Add, edit, and delete job applications.
-- Track the status of applications (e.g., Applied, Interviewing, Offered, Rejected).
-- Add notes for each application.
-- Responsive and user-friendly interface.
-- Persist data to localstorage
+👉 [Open the app on GitHub Pages](https://andols-dev.github.io/job-tracker/)
+
+## Features
+
+- Add, edit, and delete job applications
+- Track the status of applications (e.g., Applied, Interviewing, Offered, Rejected)
+- Responsive and user-friendly interface
+- Data is persisted to localStorage
 
 ## Tech Stack
 
-- **React**: For building the user interface.
-- **TypeScript**: For type safety and better developer experience.
-- **Vite**: For fast development and build tooling.
-- **TailwindCSS**: For styling.
-- **Localstorage**: For data persistence.
+- **React**: For building the user interface
+- **TypeScript**: For type safety and better developer experience
+- **Vite**: For fast development and build tooling
+- **TailwindCSS**: For styling
+- **LocalStorage**: For data persistence
 
 ## Key Functions
 
@@ -24,7 +27,7 @@ I am creating a **Job Tracker** application using **React**, **TypeScript**, and
 The `addJob` function allows users to add a new job to the job list. It updates the state and persists the data to localStorage.
 
 ```tsx
-// src\App.tsx
+// src/App.tsx
 const addJob = (job: Job) => {
   setJobList((prevJobs) => [...prevJobs, job]);
 };
@@ -34,7 +37,7 @@ const addJob = (job: Job) => {
 The `filteredJobs` function filters the job list based on the selected status.
 
 ```tsx
-// src\components\JobListTable.tsx
+// src/components/JobListTable.tsx
 const filteredJobs = useMemo(() => {
   return jobList.filter((job) =>
     filter ? Status[job.status] === filter : true
@@ -46,7 +49,7 @@ const filteredJobs = useMemo(() => {
 The app uses `useEffect` to save the job list to localStorage whenever it changes.
 
 ```tsx
-// src\App.tsx
+// src/App.tsx
 useEffect(() => {
   localStorage.setItem("jobList", JSON.stringify(jobList));
 }, [jobList]);
@@ -56,7 +59,7 @@ useEffect(() => {
 A modal is used to collect job details from the user.
 
 ```tsx
-// src\components\JobListTable.tsx
+// src/components/JobListTable.tsx
 {isModalShowing && (
   <div className="modal modal-open">
     <div className="modal-box">
