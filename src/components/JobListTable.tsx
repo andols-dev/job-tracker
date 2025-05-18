@@ -6,9 +6,26 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 interface JobListProps {
   jobList: Job[]; // List of jobs to display
   addJob: (job: Job) => void; // Function to add a new job
+  removeJob: (job: Job) => void;
+  editJob: (job: Job) => void;
+  isEditing: boolean;
+  setIsEditing: (value: boolean) => void;
+  jobEditing: Job | null;
+  setJobEditing: (value: Job | ((prev: Job | null) => Job | null)) => void;
+  setJobList: (jobList: Job[]) => void; 
 }
 
-const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
+const JobListTable: React.FC<JobListProps> = ({
+  jobList,
+  addJob,
+  removeJob,
+  editJob,
+  isEditing,
+  setIsEditing,
+  jobEditing,
+  setJobEditing,
+  setJobList,
+}) => {
   const [filter, setFilter] = useState<string>(""); // State for filtering jobs by status
   const [isModalShowing, setIsModalShowing] = useState(false); // State for showing/hiding the modal
 
@@ -35,6 +52,40 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
     reset(); // Reset the form
   };
 
+  // Function to update a specific field in jobEditing
+  const updateJobEditing = (field: keyof Job, value: any) => {
+    setJobEditing((prev: Job | null) => {
+      if (!prev) return null; // Ensure jobEditing is not null
+      return {
+        ...prev,
+        [field]: value,
+      } as Job; // Explicitly cast the returned object to the Job type
+    });
+  };
+
+  const onSubmitEdit: SubmitHandler<FieldValues> = (jobData) => {
+    // save datato jobList
+    const updatedJob: Job = {
+   
+      id: jobEditing?.id || uuidv4(), // Ensure the id is always defined
+      companyName: jobData.companyName,
+      title: jobData.jobTitle,
+      dateApplied: jobData.dateApplied,
+      status: Status[jobData.status as keyof typeof Status], // Map string to Status enum
+      notes: jobData.notes,
+    };
+    const updatedJobList = jobList.map((job) => 
+      job.id === jobEditing?.id ? updatedJob : job
+    );
+    setJobList(updatedJobList); // Update the job list with the edited job
+    setIsEditing(false); // Close the editing modal
+    setJobEditing(null as unknown as Job | ((prev: Job | null) => Job | null)); // Reset the jobEditing state
+    reset(); // Reset the form
+
+
+  };
+  // function to save the edited job
+  
   console.log(errors); // Log form errors for debugging
 
   // Memoized function to filter jobs based on the selected status
@@ -50,6 +101,7 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
     reset();
   };
 
+  
   return (
     <>
       {/* Container for the job list table and controls */}
@@ -91,6 +143,7 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
               <th className="border border-gray-300 px-6 py-3 text-left">
                 Status
               </th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -111,6 +164,20 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
                 <td className="border border-gray-300 px-6 py-4 font-semibold text-blue-600">
                   {Status[job.status]}
                 </td>
+                <td>
+                  <button
+                    onClick={() => editJob(job)}
+                    className="px-3 py-1 ml-2 mr-2 bg-yellow-400 text-white rounded hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300 shadow"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => removeJob(job)}
+                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 shadow"
+                  >
+                    Remove
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -126,7 +193,10 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
           >
             <div className="modal-box w-96 bg-white p-6">
               <h3 className="font-bold text-lg">Add a new job</h3>
-              <form className="py-4 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+              <form
+                className="py-4 space-y-6"
+                onSubmit={handleSubmit(onSubmit)}
+              >
                 {/* Input for company name */}
                 <div>
                   <label
@@ -244,6 +314,163 @@ const JobListTable: React.FC<JobListProps> = ({ jobList, addJob }) => {
                     type="button"
                     className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg shadow-md hover:bg-gray-400 focus:ring-2 focus:ring-gray-400 focus:outline-none"
                     onClick={closingModal}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Modal for editing a new job */}
+      {isEditing && (
+        <>
+          <div
+            className="modal modal-open fixed inset-0 flex items-center justify-center bg-gray-800"
+            style={{ backgroundColor: "rgba(31, 41, 55, 0.85)" }} // Custom background opacity
+          >
+            <div className="modal-box w-96 bg-white p-6">
+              <h3 className="font-bold text-lg">Edit job</h3>
+              <form
+                className="py-4 space-y-6"
+                onSubmit={handleSubmit(onSubmitEdit)}
+                
+              >
+                {/* Input for company name */}
+                <div>
+                  <label
+                    htmlFor="companyName"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder="Enter company name"
+                    value={jobEditing?.companyName || ""}
+                    {...register("companyName", {
+                      required: "Company name is required",
+                      onChange: (e) => updateJobEditing("companyName", e.target.value),
+                    })}
+                  />
+                  {errors.companyName?.message && (
+                    <span className="text-red-500 text-sm">
+                      {String(errors.companyName.message)}
+                    </span>
+                  )}
+                </div>
+                {/* Input for job title */}
+                <div>
+                  <label
+                    htmlFor="jobTitle"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Job Title
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder="Enter job title"
+                    value={jobEditing?.title || ""}
+                    {...register("jobTitle", {
+                      required: "Title is required",
+                      onChange: (e) => updateJobEditing("title", e.target.value),
+                    })}
+                  />
+                  {errors.jobTitle?.message && (
+                    <span className="text-red-500 text-sm">
+                      {String(errors.jobTitle.message)}
+                    </span>
+                  )}
+                </div>
+                {/* Input for date applied */}
+                <div>
+                  <label
+                    htmlFor="dateApplied"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Date Applied
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    {...register("dateApplied", {
+                      required: "Date is required",
+                      onChange: (e) => updateJobEditing("dateApplied", e.target.value),
+                    })}
+                    value={jobEditing?.dateApplied || ""}
+                  />
+                  {errors.dateApplied?.message && (
+                    <span className="text-red-500 text-sm">
+                      {String(errors.dateApplied.message)}
+                    </span>
+                  )}
+                </div>
+                {/* Dropdown for job status */}
+                <div>
+                  <label
+                    htmlFor="status"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Status
+                  </label>
+                  <select
+                    className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={jobEditing?.status || ""}
+                    {...register("status", {
+                      required: "Status is required",
+                      onChange: (e) => updateJobEditing("status", e.target.value),
+                    })}
+                  >
+                    <option value="">Select status</option>
+                    {Object.keys(Status)
+                      .filter((key) => isNaN(Number(key))) // Exclude numeric keys
+                      .map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                      ))}
+                  </select>
+                  {errors.status?.message && (
+                    <span className="text-red-500 text-sm">
+                      {String(errors.status.message)}
+                    </span>
+                  )}
+                </div>
+                {/* Input for notes */}
+                <div>
+                  <label
+                    htmlFor="notes"
+                    className="block text-sm font-medium text-gray-700"
+                    {...register("notes")}
+                  >
+                    Notes
+                  </label>
+                  <textarea
+                    rows={4}
+                    className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder="Add any notes here..."
+                    value={jobEditing?.notes || ""}
+                    {...register("notes", {
+                      onChange: (e) => updateJobEditing("notes", e.target.value),
+                    })}
+                  ></textarea>
+                </div>
+                {/* Modal action buttons */}
+                <div className="modal-action flex justify-end space-x-4">
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  >
+                    Submit
+                  </button>
+                  <button
+                    type="button"
+                    className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg shadow-md hover:bg-gray-400 focus:ring-2 focus:ring-gray-400 focus:outline-none"
+                    onClick={() => setIsEditing(false)}
                   >
                     Cancel
                   </button>

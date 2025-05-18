@@ -15,6 +15,9 @@ function App() {
       return [];
     }
   });
+  const [isEditing,setIsEditing] = useState(false);
+
+  const [jobEditing, setJobEditing] = useState<Job | null>(null);
 
   // Effect to update localStorage whenever the job list changes
   useEffect(() => {
@@ -23,13 +26,26 @@ function App() {
 
   // Function to add a new job to the job list
   const addJob = (job: Job) => {
+    
     setJobList((prevJobs) => [...prevJobs, job]);
   };
+
+const removeJob = (jobToRemove: Job) => {
+  const updatedJobList = jobList.filter(job => job.id !== jobToRemove.id);
+  setJobList(updatedJobList);
+}
+const editJob = (job: Job ) => {
+  setIsEditing(true);
+  setJobEditing(job); // Set the job to be edited
+  // Example usage of 'job' to avoid the error
+  
+  console.log(jobEditing);
+}
 
   // Render the application with a gradient background and pass props to DashBoard
   return (
     <div className="bg-gradient-to-r from-gray-100 to-gray-200 min-h-screen py-10">
-      <DashBoard jobList={jobList} addJob={addJob} />
+      <DashBoard jobList={jobList} addJob={addJob} removeJob={removeJob} editJob={editJob} isEditing={isEditing} setIsEditing={setIsEditing} jobEditing={jobEditing} setJobEditing={setJobEditing} setJobList={setJobList}/>
     </div>
   );
 }
