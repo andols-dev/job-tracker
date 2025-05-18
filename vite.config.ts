@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/job-tracker/', // Set base for GitHub Pages
   plugins: [react(),
     tailwindcss(),
     
